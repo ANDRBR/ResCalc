@@ -21,3 +21,9 @@ HEADERS  += mainwindow.h \
     resval.h
 
 FORMS    += ResCalc.ui
+
+DISTFILES += \
+    Changelog.txt \
+    .gitattributes \
+    .gitignore \
+    README.md

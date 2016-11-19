@@ -2,7 +2,7 @@
 #include "resval.h"
 #include "ui_ResCalc.h"
 
-void MainWindow::colorChanged(int band, int index)
+void MainWindow::colorChanged(int band)
 {
     float res = resVal.resGet(); //Holds the resistance value
     int nBands = ui->NBand_slider->value(); //Holds the number of bands currently in use
@@ -13,22 +13,22 @@ void MainWindow::colorChanged(int band, int index)
         if (res >= 1000000000)
         {
             ui->resValDisp->setValue(res /= 1000000000); //Sets the value of the resistor
-            ui->resValDispMult->setCurrentIndex(3); //Sets the multiple in Ohms
+            ui->resValDispMult->setText("GOhm"); //Sets the multiple in Ohms
         }
         else if (res >= 1000000)
         {
             ui->resValDisp->setValue(res /= 1000000); //Sets the value of the resistor
-            ui->resValDispMult->setCurrentIndex(2); //Sets the multiple in Ohms
+            ui->resValDispMult->setText("MOhm"); //Sets the multiple in Ohms
         }
         else if (res >= 1000)
         {
             ui->resValDisp->setValue(res /= 1000); //Sets the value of the resistor
-            ui->resValDispMult->setCurrentIndex(1); //Sets the multiple in Ohms
+            ui->resValDispMult->setText("kOhm"); //Sets the multiple in Ohms
         }
         else
         {
             ui->resValDisp->setValue(res); //Sets the value of the resistor
-            ui->resValDispMult->setCurrentIndex(0); //Sets the multiple in Ohms
+            ui->resValDispMult->setText("Ohm"); //Sets the multiple in Ohms
         }
     }
     else if ((band == 4 && nBands < 5) || (band == 5 && nBands > 4))

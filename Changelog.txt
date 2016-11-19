@@ -1,0 +1,8 @@
+Version: 1.0
+    - Fix: tolerance not showing 20% when slider put in 3
+    - Added ability to calculate colors of the resistor based on the value
+
+Version: Alpha 1.2
+    - Added Changelog file
+    - Added the Ability to change the value trough the multiplier word
+    - Removed empty LICENSE.md file
