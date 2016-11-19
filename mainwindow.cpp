@@ -34,7 +34,7 @@ void MainWindow::on_band1_ColorSel_currentIndexChanged(int index)
     //Sets the currently selected band color
     ui->BAND_1->setStyleSheet("background-color:" + ui->band1_ColorSel->itemText(index) + ";");
 
-    colorChanged(1, index);
+    colorChanged(1);
 }
 
 void MainWindow::on_band2_ColorSel_currentIndexChanged(int index)
@@ -56,7 +56,7 @@ void MainWindow::on_band2_ColorSel_currentIndexChanged(int index)
     //Sets the currently selected band color
     ui->BAND_2->setStyleSheet("background-color:" + ui->band2_ColorSel->itemText(index) + ";");
 
-    colorChanged(2, index);
+    colorChanged(2);
 }
 
 void MainWindow::on_band3_ColorSel_currentIndexChanged(int index)
@@ -80,7 +80,7 @@ void MainWindow::on_band3_ColorSel_currentIndexChanged(int index)
     //Sets the currently selected band color
     ui->BAND_3->setStyleSheet("background-color:" + ui->band3_ColorSel->itemText(index) + ";");
 
-    colorChanged(3, index);
+    colorChanged(3);
 }
 
 void MainWindow::on_band4_ColorSel_currentIndexChanged(int index)
@@ -102,7 +102,7 @@ void MainWindow::on_band4_ColorSel_currentIndexChanged(int index)
     //Sets the currently selected band color
     ui->BAND_4->setStyleSheet("background-color:" + ui->band4_ColorSel->itemText(index) + ";");
 
-    colorChanged(4, index);
+    colorChanged(4);
 }
 
 void MainWindow::on_band5_ColorSel_currentIndexChanged(int index)
@@ -112,7 +112,7 @@ void MainWindow::on_band5_ColorSel_currentIndexChanged(int index)
     //Sets the currently selected band color
     ui->BAND_5->setStyleSheet("background-color:" + ui->band5_ColorSel->itemText(index) + ";");
 
-    colorChanged(5, index);
+    colorChanged(5);
 }
 
 void MainWindow::on_band6_ColorSel_currentIndexChanged(int index)
@@ -122,7 +122,7 @@ void MainWindow::on_band6_ColorSel_currentIndexChanged(int index)
     //Sets the currently selected band color
     ui->BAND_6->setStyleSheet("background-color:" + ui->band6_ColorSel->itemText(index) + ";");
 
-    colorChanged(6, index);
+    colorChanged(6);
 }
 
 void MainWindow::on_NBand_slider_valueChanged(int value)
@@ -130,6 +130,8 @@ void MainWindow::on_NBand_slider_valueChanged(int value)
     switch (value)
     {
       case 6:
+        ui->tolValDisp->setReadOnly(false); //sets this value as modifiable
+
         ui->BAND_6->show(); //Shows the 6th band
          //Shows the 6th band's data
         ui->tempCoefVal_frame->show();
@@ -151,6 +153,8 @@ void MainWindow::on_NBand_slider_valueChanged(int value)
         break;
 
       case 5:
+        ui->tolValDisp->setReadOnly(false); //sets this value as modifiable
+
         ui->BAND_6->hide(); //Hides the 6th band
         //Hides the 6th band's data
         ui->tempCoefVal_frame->hide();
@@ -172,6 +176,8 @@ void MainWindow::on_NBand_slider_valueChanged(int value)
         break;
 
       case 4:
+        ui->tolValDisp->setReadOnly(false); //sets this value as modifiable
+
         ui->BAND_6->hide(); //Hides the 6th band
         //Hides the 6th band's data
         ui->tempCoefVal_frame->hide();
@@ -202,9 +208,12 @@ void MainWindow::on_NBand_slider_valueChanged(int value)
         ui->BAND_4->hide(); //Hides the 4th band
         ui->Band4_frame->hide(); //Hides the 4th band's data
         resVal.tolChg(20); //Changes the tolerance to 20%
+        ui->tolValDisp->setValue(20);
 
         ui->band3_ColorSel->clear(); //Clears the 3rd band's color indexes
         ui->band3_ColorSel->addItems(MULT_COLORS); //Sets the 3rd band's color indexes
+
+        ui->tolValDisp->setReadOnly(true); //sets this value as read only
 
         break;
     };
@@ -212,17 +221,86 @@ void MainWindow::on_NBand_slider_valueChanged(int value)
 
 void MainWindow::on_resValDisp_editingFinished()
 {
+    float res = ui->resValDisp->value();
 
+    //if the resistance value is invalid reset it and resume the program
+    if(isResValid())
+    {
+        if (res >= 1000000000)
+            ui->resValDisp->setValue(res /= 1000000000); //Sets the value of the resistor
+        else if (res >= 1000000)
+            ui->resValDisp->setValue(res /= 1000000); //Sets the value of the resistor
+        else if (res >= 1000)
+            ui->resValDisp->setValue(res /= 1000); //Sets the value of the resistor
+        else
+            ui->resValDisp->setValue(res); //Sets the value of the resistor
+        return;
+    }
+
+    res *= 100;
+    for(int i=-2; i<=9; i++, res /= 10)
+    {
+        if((int)res % 10  != 0) //Checks if the next digit is an int
+        {
+            resVal.signifChg(res);
+            resVal.multChg(i);
+            break;
+        }
+    }
+
+    //Updates the color selectors
+    if(ui->NBand_slider->value() > 4)
+    {
+        ui->band1_ColorSel->setCurrentIndex(resVal.signifGet() / 100);
+        ui->band2_ColorSel->setCurrentIndex((resVal.signifGet() / 10) % 10);
+        ui->band3_ColorSel->setCurrentIndex(resVal.signifGet() % 10);
+        ui->band4_ColorSel->setCurrentIndex(resVal.multGet() + 2);
+    }
+    else
+    {
+        ui->band1_ColorSel->setCurrentIndex(resVal.signifGet() / 10);
+        ui->band2_ColorSel->setCurrentIndex(resVal.signifGet() % 10);
+        ui->band3_ColorSel->setCurrentIndex(resVal.multGet() + 2);
+    }
 }
 
 void MainWindow::on_tolValDisp_editingFinished()
 {
-
+    int i;
+    //Tests if the tolerance value is valid
+    for(i=0; i<TOL_COLORS.size(); i++)
+    {
+        //if the value exists, change the stored value and update the screen
+        if(tolValPI[i] == ui->tolValDisp->value())
+        {
+            resVal.tolChg(tolValPI[i]);
+            if(ui->NBand_slider->value() > 4)
+                ui->band5_ColorSel->setCurrentIndex(i);
+            else
+                ui->band4_ColorSel->setCurrentIndex(i);
+            break;
+        }
+    }
+    //if the value doesn't exists undo the modification
+    if(i==TOL_COLORS.size()) ui->tolValDisp->setValue(resVal.tolGet());
 }
 
 void MainWindow::on_tCoefValDisp_editingFinished()
 {
-
+    int i;
+    //Tests if the temperature coeficient value is valid
+    for(i=0; i<TC_COLORS.size(); i++)
+    {
+        //if the value exists, change the stored value and update the screen
+        if(tcValPI[i] == ui->tCoefValDisp->value())
+        {
+            resVal.tempCoefChg(tcValPI[i]);
+            ui->band6_ColorSel->setCurrentIndex(i);
+            break;
+        }
+    }
+    //if the value doesn't exists undo the modification
+    if(i==TC_COLORS.size()) ui->tCoefValDisp->setValue(resVal.tempCoefGet());
 }
 
 void MainWindow::on_resValDispMult_editingFinished()
@@ -252,6 +330,7 @@ void MainWindow::on_resValDispMult_editingFinished()
         return;
     }
 
+    //if "ohm" have a prefix, the corresponding multiplier is added
     if(aux.length() == 4)
     {
         switch (aux.at(0).unicode())
@@ -278,6 +357,7 @@ void MainWindow::on_resValDispMult_editingFinished()
         }
     }
 
+    //Updates the color selectors
     if(ui->NBand_slider->value() > 4)
     {
         ui->band4_ColorSel->setCurrentIndex(i+2);
@@ -287,4 +367,55 @@ void MainWindow::on_resValDispMult_editingFinished()
         ui->band3_ColorSel->setCurrentIndex(i+2);
     }
 
+}
+
+//Function to test if a written resistance is valid
+bool MainWindow::isResValid()
+{
+    float res = ui->resValDisp->value();
+    int exp, i;
+
+    if(ui->resValDisp->value() < 0.01) //Checks for the minimum value of resistance
+        return false;
+
+    //Checks the current value of the multiplier and stores the maximum value for the exponent
+    if(ui->resValDispMult->text().compare("Ohm", Qt::CaseInsensitive) == 0) //if the multiple is "Ohm", exp = 9
+        exp = 9;
+    else
+    {
+        //Shearches for the value of the multiplier
+        for(exp = 3, i=0; exp <= 9; exp += 3, i++)
+        {
+            if(ui->resValDispMult->text().compare(OHM_MULT.at(i), Qt::CaseInsensitive) == 0)
+                break;
+        }
+        if(exp > 9) //if it didn't find the multiplier it returns false
+            return false;
+
+        exp = 9 - exp; //assigns the value of exp
+    }
+
+    //Checks for the maximum value it can have
+    if(ui->NBand_slider->value() > 4 && res > 999 * pow(10, exp))
+        return false;
+    if(ui->NBand_slider->value() <= 4 && res > 99 * pow(10, exp))
+        return false;
+
+    //Tests if the number of significative digits is valid
+    if (res < 1) res *= 100;
+    for(int i=0; i<=9; i++, res /= 10)
+    {
+        if((int)res % 10  != 0) //Checks if the next digit is an int
+        {
+            if(ui->NBand_slider->value() > 4 && res > 999)
+                return false;
+            if(ui->NBand_slider->value() <= 4 && res > 99)
+                return false;
+            break;
+        }
+    }
+    if(i>9) return false;
+
+    //if it fullfills all the tests return true
+    return true;
 }

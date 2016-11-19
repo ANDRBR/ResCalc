@@ -2,7 +2,7 @@
 #include "resval.h"
 #include "ui_ResCalc.h"
 
-void MainWindow::colorChanged(int band, int index)
+void MainWindow::colorChanged(int band)
 {
     float res = resVal.resGet(); //Holds the resistance value
     int nBands = ui->NBand_slider->value(); //Holds the number of bands currently in use

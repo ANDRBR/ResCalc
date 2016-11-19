@@ -44,7 +44,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    void colorChanged(int band, int index);
+    void colorChanged(int band); //Function to update the screen when colors have changed
+    bool isResValid(); //Function to test if a written resistance is valid
 
     ResVal resVal;
     QMessageBox* msgDialog = new QMessageBox();

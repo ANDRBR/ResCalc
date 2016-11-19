@@ -347,6 +347,12 @@
              </property>
              <item>
               <widget class="QDoubleSpinBox" name="tolValDisp">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
                <property name="decimals">
                 <number>2</number>
                </property>
