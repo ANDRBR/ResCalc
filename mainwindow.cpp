@@ -125,8 +125,6 @@ void MainWindow::on_band6_ColorSel_currentIndexChanged(int index)
     colorChanged(6, index);
 }
 
-
-
 void MainWindow::on_NBand_slider_valueChanged(int value)
 {
     switch (value)
@@ -210,4 +208,83 @@ void MainWindow::on_NBand_slider_valueChanged(int value)
 
         break;
     };
+}
+
+void MainWindow::on_resValDisp_editingFinished()
+{
+
+}
+
+void MainWindow::on_tolValDisp_editingFinished()
+{
+
+}
+
+void MainWindow::on_tCoefValDisp_editingFinished()
+{
+
+}
+
+void MainWindow::on_resValDispMult_editingFinished()
+{
+    QString aux = ui->resValDispMult->text();
+    float res = ui->resValDisp->value();
+    int i;
+
+    /*Checks if the introduced text is invalid:
+     * doesn't contain the word "ohm"
+     * doesn´t have a length <= 4
+     * doesn't have a valid prefix
+    */
+    if(!(aux.contains("Ohm", Qt::CaseInsensitive) && (aux.length() <= 4 || res >= 1 ||
+       (aux.length() == 4 && (aux.at(0) == 'k' || aux.at(0) == 'M' || aux.at(0) == 'G')))))
+    {
+        //Finds the current multiplier
+        for(i=0; i <= 3; i++, res *= 1000)
+        {
+            if(resVal.resGet() == res)
+            {
+                ui->resValDispMult->setText(OHM_MULT.at(i));
+                break;
+            }
+        }
+
+        return;
+    }
+
+    if(aux.length() == 4)
+    {
+        switch (aux.at(0).unicode())
+        {
+        case 'k':
+            res *= pow(10, 3);
+            break;
+        case 'M':
+            res *= pow(10, 6);
+            break;
+        case 'G':
+            res *= pow(10, 9);
+            break;
+        }
+    }
+
+    //Updates the multiplier value
+    for(i=0; i<=9; i+=3)
+    {
+        if(resVal.resGet() * pow(10, i) == res)
+        {
+            resVal.multChg(resVal.multGet() + i);
+            break;
+        }
+    }
+
+    if(ui->NBand_slider->value() > 4)
+    {
+        ui->band4_ColorSel->setCurrentIndex(i+2);
+    }
+    else
+    {
+        ui->band3_ColorSel->setCurrentIndex(i+2);
+    }
+
 }

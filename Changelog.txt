@@ -1,0 +1,4 @@
+Version: Alpha 1.2
+    - Added Changelog file
+    - Added the Ability to change the value trough the multiplier word
+    - Removed empty LICENSE.md file

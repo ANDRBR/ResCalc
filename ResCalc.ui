@@ -302,30 +302,16 @@
                <property name="maximum">
                 <double>99999999999.000000000000000</double>
                </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="resValDispMult">
-               <item>
-                <property name="text">
-                 <string>Ohm</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>kOhm</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>MOhm</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>GOhm</string>
-                </property>
-               </item>
+              <widget class="QLineEdit" name="resValDispMult">
+               <property name="text">
+                <string>Ohm</string>
+               </property>
               </widget>
              </item>
             </layout>
